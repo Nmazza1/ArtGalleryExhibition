@@ -1,0 +1,81 @@
+﻿@model ArtGalleryExhibition.Models.Exhibition
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Exhibition</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.currentlyRunning)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.currentlyRunning)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Artworks</h4>
+    <hr />
+    @if (Model.ArtWorks != null)
+    {
+        foreach (var artWork in Model.ArtWorks)
+        {
+            <div>
+                <p>@Html.DisplayFor(modelItem => artWork.Title)</p>
+                <!-- Display other artwork properties as needed -->
+            </div>
+        }
+    }
+    else
+    {
+        <p>No artworks available.</p>
+    }
+</div>
+
+<div>
+    <h4>Artists</h4>
+    <hr />
+    @if (Model.Artists != null)
+    {
+        foreach (var artist in Model.Artists)
+        {
+            <div>
+                <p>@Html.DisplayFor(modelItem => artist.FirstName) @Html.DisplayFor(modelItem => artist.LastName)</p>
+                <!-- Display other artist properties as needed -->
+            </div>
+        }
+    }
+    else
+    {
+        <p>No artists available.</p>
+    }
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
