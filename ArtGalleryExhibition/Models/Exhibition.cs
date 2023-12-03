@@ -22,5 +22,24 @@ namespace ArtGalleryExhibition.Models
         public List<ArtWork>? ArtWorks { get; set; } = new List<ArtWork>();
         [Required(ErrorMessage = "Error with the Artists.")]
         public List<Artist>? Artists { get; set; } = new List<Artist>();
+
+        public Exhibition(Exhibition original)
+        {
+            // Copy primitive properties
+            this.Id = original.Id;
+            this.StartDate = original.StartDate;
+            this.EndDate = original.EndDate;
+            this.Address = original.Address;
+            this.currentlyRunning = original.currentlyRunning;
+
+            // Create new lists and copy items in case of reference types
+            this.ArtWorks = new List<ArtWork>(original.ArtWorks);
+            this.Artists = new List<Artist>(original.Artists);
+        }
+
+        public Exhibition()
+        {
+
+        }
     }
 }

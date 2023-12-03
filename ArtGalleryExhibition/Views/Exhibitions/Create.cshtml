@@ -1,7 +1,15 @@
 ﻿@model ArtGalleryExhibition.Models.CreateExhibitionViewModel
+@using Newtonsoft.Json;
 
 @{
     ViewData["Title"] = "Create";
+   
+
+    // ...
+
+    Console.WriteLine("Received ViewModel:");
+    Console.WriteLine(JsonConvert.SerializeObject(Model, Formatting.Indented));
+
 }
 
 <h1>Create</h1>
@@ -35,14 +43,15 @@
 
             <hr/>
             <!-- Art Pieces Included checkboxes -->
-            @if(Model.ArtWorks != null)
+            @if (Model.passedArtworks != null)
             {
-                @foreach (var artWork in Model.ArtWorks)
+                @foreach (var artwork in Model.passedArtworks)
                 {
+                    
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="artworkCheckbox@(artWork.Id)" name="SelectedArtworkIds" value="@artWork.Id">
-                        <label class="form-check-label" for="artworkCheckbox@(artWork.Id)">
-                            @artWork.Title
+                        <input class="form-check-input" type="checkbox" id="artworkCheckbox@(artwork.Id)" name="SelectedArtworkIds" value="@artwork.Id">
+                        <label class="form-check-label" for="artworkCheckbox@(artwork.Id)">
+                            @artwork.Title
                         </label>
                     </div>
                 }
@@ -51,12 +60,13 @@
             {
                 <p>Error / No Present Artworks to choose.</p>
             }
+
             <hr/>
 
             <!-- Artists checkboxes -->
-            @if(Model.Artists != null)
+            @if(Model.passedArtists != null)
             {
-                @foreach (var artist in Model.Artists)
+                @foreach (var artist in Model.passedArtists)
                 {
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="artistCheckbox@(artist.Id)" name="SelectedArtistIds" value="@artist.Id">

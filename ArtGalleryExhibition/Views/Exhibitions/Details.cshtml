@@ -1,7 +1,10 @@
 ﻿@model ArtGalleryExhibition.Models.Exhibition
-
+@using Newtonsoft.Json;
 @{
     ViewData["Title"] = "Details";
+    Console.WriteLine("Received ViewModel:");
+    Console.WriteLine(JsonConvert.SerializeObject(Model, Formatting.Indented));
+
 }
 
 <h1>Details</h1>
@@ -10,6 +13,12 @@
     <h4>Exhibition</h4>
     <hr />
     <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
@@ -42,9 +51,11 @@
     <hr />
     @if (Model.ArtWorks != null)
     {
+        <p>Artworks isn't null</p>
         foreach (var artWork in Model.ArtWorks)
         {
             <div>
+                <img src="@artWork.ImageUrl)">
                 <p>@Html.DisplayFor(modelItem => artWork.Title)</p>
                 <!-- Display other artwork properties as needed -->
             </div>
@@ -55,6 +66,7 @@
         <p>No artworks available.</p>
     }
 </div>
+
 
 <div>
     <h4>Artists</h4>

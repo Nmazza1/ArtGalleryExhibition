@@ -7,13 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ArtGalleryExhibition.Data;
 using ArtGalleryExhibition.Models;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
 
 namespace ArtGalleryExhibition.Controllers
 {
     public class ExhibitionsController : Controller
     {
-        private readonly ArtGalleryExhibitionContext _context;
-
+        private ArtGalleryExhibitionContext _context;
+        Random randomNum = new Random();
         public ExhibitionsController(ArtGalleryExhibitionContext context)
         {
             _context = context;
@@ -48,16 +50,14 @@ namespace ArtGalleryExhibition.Controllers
         // GET: Exhibitions/Create
         public async Task<IActionResult> CreateAsync()
         {
-            var exhibition = new  Exhibition();
-            var viewModel = new CreateExhibitionViewModel
+            var exhibition = new CreateExhibitionViewModel()
             {
-                Exhibition = exhibition,
-                ArtWorks = await _context.ArtWork.ToArrayAsync(),
-                Artists = await _context.Artist.ToArrayAsync()
-                // Other properties initialization here
+                Exhibition = new Exhibition(),
+                passedArtworks = await _context.ArtWork.ToListAsync(),
+                passedArtists = await _context.Artist.ToListAsync()
             };
 
-            return View(viewModel);
+            return View(exhibition);
         }
 
 
@@ -65,58 +65,51 @@ namespace ArtGalleryExhibition.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateExhibitionViewModel viewModel)
         {
-            try
+            Console.WriteLine($"Initial ViewModel: {JsonConvert.SerializeObject(viewModel)}");
+            var toPostExhibition = new Exhibition();
+            toPostExhibition.StartDate = viewModel.Exhibition.StartDate;
+            toPostExhibition.EndDate = viewModel.Exhibition.EndDate;
+            toPostExhibition.Address = viewModel.Exhibition.Address;
+            toPostExhibition.currentlyRunning = viewModel.Exhibition.currentlyRunning;
+            foreach(var artId in viewModel.SelectedArtworkIds)
             {
-                Console.WriteLine("Create method started");
-                var toPostExhibition = new Exhibition
+                var artWork = _context.ArtWork.FirstOrDefault(a => a.Id == artId);
+
+                if (artWork != null)
                 {
-                    ArtWorks = new List<ArtWork>(),
-                    Artists = new List<Artist>()
-                };
-                //       if (ModelState.IsValid)
-                //     {
-                Console.WriteLine("ModelState is valid");
-
-                   
-                    toPostExhibition.StartDate = viewModel.Exhibition.StartDate;
-                    toPostExhibition.EndDate = viewModel.Exhibition.EndDate;
-                    toPostExhibition.Address = viewModel.Exhibition.Address;
-                    toPostExhibition.currentlyRunning = viewModel.Exhibition.currentlyRunning;
-
-                Console.WriteLine(viewModel.SelectedArtworkIds);
-                Console.WriteLine(viewModel.SelectedArtistIds);
-                foreach (var artId in viewModel.SelectedArtworkIds)
-                {
-                    var artWork = _context.ArtWork.FirstOrDefault(a => a.Id == artId);
-
-                    if (artWork != null)
-                    {
-                        toPostExhibition.ArtWorks.Add(artWork);
-                    }
+                    toPostExhibition.ArtWorks.Add(artWork);
                 }
+                toPostExhibition.ArtWorks.Add(artWork);
+            }
+            foreach (var artistId in viewModel.SelectedArtistIds)
+            {
+                var artist = _context.Artist.FirstOrDefault(a => a.Id == artistId);
 
+                if (artist != null)
+                {
+                    toPostExhibition.Artists.Add(artist);
+                }
+            }
 
-                foreach (var artistId in viewModel.SelectedArtistIds)
-                    {
-                        var artist = _context.Artist.FirstOrDefault(a => a.Id == artistId);
-
-                        if(artist != null)
-                        {
-                          toPostExhibition.Artists.Add(artist);
-                        }
-                    }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Console.WriteLine($"Posting ViewModel: {JsonConvert.SerializeObject(toPostExhibition)}");
                     _context.Add(toPostExhibition);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction("Home", "Index");
-               // }
-
-               // return RedirectToAction("Create");
-
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception in Create method: {ex}");
+                    throw; // Rethrow the exception for proper logging
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Exception in Create method: {ex}");
-                throw; // Rethrow the exception for proper logging
+                Console.WriteLine($"Received ViewModel on Error: {JsonConvert.SerializeObject(viewModel)}");
+                return RedirectToAction("Create");
             }
         }
 
