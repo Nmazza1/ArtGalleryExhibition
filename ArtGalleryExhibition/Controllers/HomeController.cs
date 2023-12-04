@@ -1,6 +1,7 @@
 ﻿    using ArtGalleryExhibition.Data;
     using ArtGalleryExhibition.Models;
-    using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Diagnostics;
 
@@ -36,6 +37,11 @@
             {
                 return View();
             }
+        [Authorize(Roles = "Admin")]
+        public IActionResult AdminPage()
+        {
+            return View();
+        }
 
             [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
             public IActionResult Error()
