@@ -4,6 +4,7 @@ using ArtGalleryExhibition.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ArtGalleryExhibition.Migrations
 {
     [DbContext(typeof(ArtGalleryExhibitionContext))]
-    partial class ArtGalleryExhibitionContextModelSnapshot : ModelSnapshot
+    [Migration("20231203214654_addedNameToExhibition")]
+    partial class addedNameToExhibition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +35,11 @@ namespace ArtGalleryExhibition.Migrations
                     b.Property<int?>("ExhibitionID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -55,10 +61,7 @@ namespace ArtGalleryExhibition.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
-                    b.Property<string>("ArtistID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ArtistID1")
+                    b.Property<int?>("ArtistID")
                         .HasColumnType("int");
 
                     b.Property<string>("CompletionDate")
@@ -79,12 +82,9 @@ namespace ArtGalleryExhibition.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isFeatured")
-                        .HasColumnType("bit");
-
                     b.HasKey("ID");
 
-                    b.HasIndex("ArtistID1");
+                    b.HasIndex("ArtistID");
 
                     b.HasIndex("ExhibitionID");
 
@@ -129,8 +129,8 @@ namespace ArtGalleryExhibition.Migrations
             modelBuilder.Entity("ArtGalleryExhibition.Models.ArtWork", b =>
                 {
                     b.HasOne("ArtGalleryExhibition.Models.Artist", null)
-                        .WithMany("Artworks")
-                        .HasForeignKey("ArtistID1");
+                        .WithMany("ArtWorks")
+                        .HasForeignKey("ArtistID");
 
                     b.HasOne("ArtGalleryExhibition.Models.Exhibition", null)
                         .WithMany("works")
@@ -139,7 +139,7 @@ namespace ArtGalleryExhibition.Migrations
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Artist", b =>
                 {
-                    b.Navigation("Artworks");
+                    b.Navigation("ArtWorks");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Exhibition", b =>

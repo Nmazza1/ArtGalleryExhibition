@@ -20,7 +20,7 @@
                 {
 
                     <div class="my-3 mx-2 p-2">
-                        <p>@Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)</p>
+                        <p>@Html.DisplayFor(modelItem => item.Name)</p>
                     </div>
                 }
             }
@@ -33,10 +33,14 @@
         <div class="border overflow-hidden" style="display: flex;">
             @foreach (var item in Model.artworks)
             {
-                <div class="m-3">
-                    <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" height="250" /><br />
-                    <a asp-controller="Artworks" asp-action="Details" asp-route-id="@item.Id" style="text-decoration-line: none;">@Html.DisplayFor(modelItem => item.Title)</a>
-                </div>
+                if(item.isFeatured.HasValue.Equals(true))
+                {
+                    <div class="m-3">
+                        <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" height="250" /><br />
+                        <a asp-controller="Artworks" asp-action="Details" asp-route-id="@item.ID" style="text-decoration-line: none;">@Html.DisplayFor(modelItem => item.Title)</a>
+                    </div>
+                }
+                
             }
         </div>
     </div>
@@ -51,12 +55,14 @@
             {
                 if (item.currentlyRunning)
                 {
-
-                    <div class="m-3 border">
-                        <p>Starts: @Html.DisplayFor(modelItem => item.StartDate)</p>
-                        <p>Ends: @Html.DisplayFor(modelItem => item.EndDate)</p>
-                        <p>Address: @Html.DisplayFor(modelItem => item.Address)</p>
-                    </div>
+                    <a href="@Url.Action("Details", "Exhibitions", new { id = item.ID })" style="text-decoration: none;" class="text-black">
+                        <div class="m-3 border">
+                            <p>Starts: @Html.DisplayFor(modelItem => item.StartDate)</p>
+                            <p>Ends: @Html.DisplayFor(modelItem => item.EndDate)</p>
+                            <p>Address: @Html.DisplayFor(modelItem => item.Address)</p>
+                        </div>
+                    </a>
+                    
                 }
             }
         </div>

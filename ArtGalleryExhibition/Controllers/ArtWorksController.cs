@@ -19,6 +19,7 @@ namespace ArtGalleryExhibition.Controllers
             _context = context;
         }
 
+
         // GET: ArtWorks
         public async Task<IActionResult> Index()
         {
@@ -36,7 +37,7 @@ namespace ArtGalleryExhibition.Controllers
             }
 
             var artWork = await _context.ArtWork
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (artWork == null)
             {
                 return NotFound();
@@ -48,6 +49,8 @@ namespace ArtGalleryExhibition.Controllers
         // GET: ArtWorks/Create
         public IActionResult Create()
         {
+            PopulateExhibitionsDropDownList();
+            PopulateArtistDropDownList();
             return View();
         }
 
@@ -56,7 +59,7 @@ namespace ArtGalleryExhibition.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Price,Description,CompletionDate,ImageUrl")] ArtWork artWork)
+        public async Task<IActionResult> Create([Bind("ID,Title,Price,Description,CompletionDate,ImageUrl,ExhibitionID")] ArtWork artWork)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +67,8 @@ namespace ArtGalleryExhibition.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            PopulateExhibitionsDropDownList();
+            PopulateArtistDropDownList();
             return View(artWork);
         }
 
@@ -80,6 +85,7 @@ namespace ArtGalleryExhibition.Controllers
             {
                 return NotFound();
             }
+            PopulateArtistDropDownList();
             return View(artWork);
         }
 
@@ -88,9 +94,9 @@ namespace ArtGalleryExhibition.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Price,Description,CompletionDate,ImageUrl")] ArtWork artWork)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Price,Description,CompletionDate,ImageUrl,ExhibitionID")] ArtWork artWork)
         {
-            if (id != artWork.Id)
+            if (id != artWork.ID)
             {
                 return NotFound();
             }
@@ -104,7 +110,7 @@ namespace ArtGalleryExhibition.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ArtWorkExists(artWork.Id))
+                    if (!ArtWorkExists(artWork.ID))
                     {
                         return NotFound();
                     }
@@ -113,6 +119,8 @@ namespace ArtGalleryExhibition.Controllers
                         throw;
                     }
                 }
+                PopulateExhibitionsDropDownList();
+                PopulateArtistDropDownList();
                 return RedirectToAction(nameof(Index));
             }
             return View(artWork);
@@ -127,7 +135,7 @@ namespace ArtGalleryExhibition.Controllers
             }
 
             var artWork = await _context.ArtWork
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (artWork == null)
             {
                 return NotFound();
@@ -157,7 +165,24 @@ namespace ArtGalleryExhibition.Controllers
 
         private bool ArtWorkExists(int id)
         {
-          return (_context.ArtWork?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.ArtWork?.Any(e => e.ID == id)).GetValueOrDefault();
+        }
+
+        private void PopulateExhibitionsDropDownList()
+        {
+            var exhibitionsQuery = from d in _context.Exhibition
+                                   orderby d.Name
+                                   select d;
+            Console.WriteLine("Executed Exhibition Query");
+            Console.Write(exhibitionsQuery);
+            ViewBag.ExhibitionID = new SelectList(exhibitionsQuery, "ID", "Name");
+        }
+        private void PopulateArtistDropDownList()
+        {
+            var artworksQuery = from d in _context.Artist
+                                orderby d.Name
+                                select d;
+            ViewBag.ArtistID = new SelectList(artworksQuery, "ID", "Name");
         }
     }
 }

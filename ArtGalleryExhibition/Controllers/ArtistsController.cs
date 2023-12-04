@@ -34,9 +34,10 @@ namespace ArtGalleryExhibition.Controllers
             {
                 return NotFound();
             }
-
             var artist = await _context.Artist
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(m => m.Artworks)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (artist == null)
             {
                 return NotFound();
@@ -48,6 +49,7 @@ namespace ArtGalleryExhibition.Controllers
         // GET: Artists/Create
         public IActionResult Create()
         {
+            PopulateExhibitionsDropDownList();
             return View();
         }
 
@@ -56,7 +58,7 @@ namespace ArtGalleryExhibition.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,isFeatured")] Artist artist)
+        public async Task<IActionResult> Create([Bind("ID,Name,isFeatured,ExhibitionID")] Artist artist)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +66,7 @@ namespace ArtGalleryExhibition.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            PopulateExhibitionsDropDownList();
             return View(artist);
         }
 
@@ -80,6 +83,7 @@ namespace ArtGalleryExhibition.Controllers
             {
                 return NotFound();
             }
+            PopulateExhibitionsDropDownList();
             return View(artist);
         }
 
@@ -88,9 +92,9 @@ namespace ArtGalleryExhibition.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,isFeatured")] Artist artist)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,isFeatured,ExhibitionID")] Artist artist)
         {
-            if (id != artist.Id)
+            if (id != artist.ID)
             {
                 return NotFound();
             }
@@ -104,7 +108,7 @@ namespace ArtGalleryExhibition.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ArtistExists(artist.Id))
+                    if (!ArtistExists(artist.ID))
                     {
                         return NotFound();
                     }
@@ -115,6 +119,7 @@ namespace ArtGalleryExhibition.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            PopulateExhibitionsDropDownList();
             return View(artist);
         }
 
@@ -127,7 +132,7 @@ namespace ArtGalleryExhibition.Controllers
             }
 
             var artist = await _context.Artist
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (artist == null)
             {
                 return NotFound();
@@ -157,7 +162,16 @@ namespace ArtGalleryExhibition.Controllers
 
         private bool ArtistExists(int id)
         {
-          return (_context.Artist?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Artist?.Any(e => e.ID == id)).GetValueOrDefault();
         }
+        private void PopulateExhibitionsDropDownList()
+        {
+            var exhibitionsQuery = from d in _context.Exhibition
+                                   orderby d.Name
+                                   select d;
+
+            ViewBag.ExhibitionID = new SelectList(exhibitionsQuery, "ID", "Name");
+        }
+
     }
 }

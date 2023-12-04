@@ -8,18 +8,55 @@ using Microsoft.EntityFrameworkCore;
 using ArtGalleryExhibition.Data;
 using ArtGalleryExhibition.Models;
 using Newtonsoft.Json;
-using System.Security.Cryptography;
 
 namespace ArtGalleryExhibition.Controllers
 {
     public class ExhibitionsController : Controller
     {
-        private ArtGalleryExhibitionContext _context;
-        Random randomNum = new Random();
-        public ExhibitionsController(ArtGalleryExhibitionContext context)
+        private readonly ArtGalleryExhibitionContext _context;
+        private readonly ICartService _cartService;
+
+        public ExhibitionsController(ArtGalleryExhibitionContext context, ICartService cartService)
         {
             _context = context;
+            _cartService = cartService;
         }
+
+        [HttpPost]
+        public IActionResult AddSelectedArtworksToCart([FromForm] List<int> selectedArtworkIds, int exhibitionId)
+
+        {
+            Console.WriteLine($"Exhibition ID: {exhibitionId}");
+            Console.WriteLine("Selected Artwork ID's: " + string.Join(", ", selectedArtworkIds));
+
+            // Assuming you have a method to get artworks by IDs
+            var chosenArts = new List<CartItem>();
+            foreach(var artId in selectedArtworkIds)
+            {
+              var artwork =  _context.ArtWork.FirstOrDefault(m => m.ID == artId);
+                chosenArts.Add(new CartItem(artwork.ID, artwork.Title, (decimal)artwork.Price));
+            }
+            var selectedArtworks = _context.ArtWork
+                .Where(artwork => selectedArtworkIds.Contains(artwork.ID))
+                .ToList();
+
+            foreach (var artwork in selectedArtworks)
+            {
+                _cartService.AddToCart(artwork.ID, artwork.Title, (decimal)artwork.Price);
+            }
+
+            // Log the current cart to the console
+            Console.WriteLine("Current Cart:");
+            var currentCart = _cartService.GetCart();
+            foreach (var item in currentCart)
+            {
+                Console.WriteLine($"Artwork ID: {item.ArtworkId}, Title: {item.Title}, Price: {item.Price}");
+            }
+
+            // Redirect back to the exhibition details page or wherever appropriate
+            return RedirectToAction("Details", new { id = exhibitionId });
+        }
+
 
         // GET: Exhibitions
         public async Task<IActionResult> Index()
@@ -38,7 +75,10 @@ namespace ArtGalleryExhibition.Controllers
             }
 
             var exhibition = await _context.Exhibition
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(m => m.works)
+                .Include(m => m.artists)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (exhibition == null)
             {
                 return NotFound();
@@ -48,69 +88,31 @@ namespace ArtGalleryExhibition.Controllers
         }
 
         // GET: Exhibitions/Create
-        public async Task<IActionResult> CreateAsync()
+        public IActionResult Create()
         {
-            var exhibition = new CreateExhibitionViewModel()
-            {
-                Exhibition = new Exhibition(),
-                passedArtworks = await _context.ArtWork.ToListAsync(),
-                passedArtists = await _context.Artist.ToListAsync()
-            };
-
-            return View(exhibition);
+            return View();
         }
 
-
+        // POST: Exhibitions/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateExhibitionViewModel viewModel)
+        public async Task<IActionResult> Create([Bind("ID,Name,StartDate,EndDate,Address,currentlyRunning")] Exhibition exhibition)
         {
-            Console.WriteLine($"Initial ViewModel: {JsonConvert.SerializeObject(viewModel)}");
-            var toPostExhibition = new Exhibition();
-            toPostExhibition.StartDate = viewModel.Exhibition.StartDate;
-            toPostExhibition.EndDate = viewModel.Exhibition.EndDate;
-            toPostExhibition.Address = viewModel.Exhibition.Address;
-            toPostExhibition.currentlyRunning = viewModel.Exhibition.currentlyRunning;
-            foreach(var artId in viewModel.SelectedArtworkIds)
+            if (!ModelState.IsValid)
             {
-                var artWork = _context.ArtWork.FirstOrDefault(a => a.Id == artId);
-
-                if (artWork != null)
-                {
-                    toPostExhibition.ArtWorks.Add(artWork);
-                }
-                toPostExhibition.ArtWorks.Add(artWork);
-            }
-            foreach (var artistId in viewModel.SelectedArtistIds)
-            {
-                var artist = _context.Artist.FirstOrDefault(a => a.Id == artistId);
-
-                if (artist != null)
-                {
-                    toPostExhibition.Artists.Add(artist);
-                }
+                Console.WriteLine("Model is not valid: " + JsonConvert.SerializeObject(exhibition, Formatting.Indented));
+                return View("Create", exhibition);
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    Console.WriteLine($"Posting ViewModel: {JsonConvert.SerializeObject(toPostExhibition)}");
-                    _context.Add(toPostExhibition);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction("Index", "Home");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception in Create method: {ex}");
-                    throw; // Rethrow the exception for proper logging
-                }
+                _context.Add(exhibition);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                Console.WriteLine($"Received ViewModel on Error: {JsonConvert.SerializeObject(viewModel)}");
-                return RedirectToAction("Create");
-            }
+            return View(exhibition);
         }
 
         // GET: Exhibitions/Edit/5
@@ -134,9 +136,9 @@ namespace ArtGalleryExhibition.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,StartDate,EndDate,Address,currentlyRunning")] Exhibition exhibition)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,StartDate,EndDate,Address,currentlyRunning")] Exhibition exhibition)
         {
-            if (id != exhibition.Id)
+            if (id != exhibition.ID)
             {
                 return NotFound();
             }
@@ -150,7 +152,7 @@ namespace ArtGalleryExhibition.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ExhibitionExists(exhibition.Id))
+                    if (!ExhibitionExists(exhibition.ID))
                     {
                         return NotFound();
                     }
@@ -173,7 +175,7 @@ namespace ArtGalleryExhibition.Controllers
             }
 
             var exhibition = await _context.Exhibition
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (exhibition == null)
             {
                 return NotFound();
@@ -203,7 +205,7 @@ namespace ArtGalleryExhibition.Controllers
 
         private bool ExhibitionExists(int id)
         {
-          return (_context.Exhibition?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Exhibition?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

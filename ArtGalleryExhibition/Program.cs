@@ -8,6 +8,9 @@ builder.Services.AddDbContext<ArtGalleryExhibitionContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 
 var app = builder.Build();
 
