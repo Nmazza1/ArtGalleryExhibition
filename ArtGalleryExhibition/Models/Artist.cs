@@ -2,12 +2,12 @@
 {
     public class Artist
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string Name { get; set; }
         public bool isFeatured { get; set; }    
 
-        public List<ArtWork> ArtWorks { get; } = new();
+        public ICollection<ArtWork> Artworks { get; set; } = new List<ArtWork>();
+        public int? ExhibitionID { get; set; }
     }
 }

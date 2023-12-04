@@ -4,6 +4,7 @@ using ArtGalleryExhibition.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ArtGalleryExhibition.Migrations
 {
     [DbContext(typeof(ArtGalleryExhibitionContext))]
-    partial class ArtGalleryExhibitionContextModelSnapshot : ModelSnapshot
+    [Migration("20231203201350_addingdata")]
+    partial class addingdata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,41 +26,42 @@ namespace ArtGalleryExhibition.Migrations
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Artist", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("ExhibitionID")
+                    b.Property<int?>("ExhibitionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isFeatured")
                         .HasColumnType("bit");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ExhibitionID");
+                    b.HasIndex("ExhibitionId");
 
                     b.ToTable("Artist");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.ArtWork", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("ArtistID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ArtistID1")
+                    b.Property<int?>("ArtistId")
                         .HasColumnType("int");
 
                     b.Property<string>("CompletionDate")
@@ -67,7 +70,7 @@ namespace ArtGalleryExhibition.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ExhibitionID")
+                    b.Property<int?>("ExhibitionId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
@@ -79,42 +82,39 @@ namespace ArtGalleryExhibition.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isFeatured")
-                        .HasColumnType("bit");
+                    b.HasKey("Id");
 
-                    b.HasKey("ID");
+                    b.HasIndex("ArtistId");
 
-                    b.HasIndex("ArtistID1");
-
-                    b.HasIndex("ExhibitionID");
+                    b.HasIndex("ExhibitionId");
 
                     b.ToTable("ArtWork");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Exhibition", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EndDate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StartDate")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("currentlyRunning")
                         .HasColumnType("bit");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Exhibition");
                 });
@@ -122,31 +122,31 @@ namespace ArtGalleryExhibition.Migrations
             modelBuilder.Entity("ArtGalleryExhibition.Models.Artist", b =>
                 {
                     b.HasOne("ArtGalleryExhibition.Models.Exhibition", null)
-                        .WithMany("artists")
-                        .HasForeignKey("ExhibitionID");
+                        .WithMany("Artists")
+                        .HasForeignKey("ExhibitionId");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.ArtWork", b =>
                 {
                     b.HasOne("ArtGalleryExhibition.Models.Artist", null)
-                        .WithMany("Artworks")
-                        .HasForeignKey("ArtistID1");
+                        .WithMany("ArtWorks")
+                        .HasForeignKey("ArtistId");
 
                     b.HasOne("ArtGalleryExhibition.Models.Exhibition", null)
-                        .WithMany("works")
-                        .HasForeignKey("ExhibitionID");
+                        .WithMany("ArtWorks")
+                        .HasForeignKey("ExhibitionId");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Artist", b =>
                 {
-                    b.Navigation("Artworks");
+                    b.Navigation("ArtWorks");
                 });
 
             modelBuilder.Entity("ArtGalleryExhibition.Models.Exhibition", b =>
                 {
-                    b.Navigation("artists");
+                    b.Navigation("ArtWorks");
 
-                    b.Navigation("works");
+                    b.Navigation("Artists");
                 });
 #pragma warning restore 612, 618
         }

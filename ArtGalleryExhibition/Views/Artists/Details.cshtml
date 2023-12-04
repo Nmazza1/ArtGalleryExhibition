@@ -1,7 +1,13 @@
 ﻿@model ArtGalleryExhibition.Models.Artist
-
+@using Newtonsoft.Json;
 @{
+
     ViewData["Title"] = "Details";
+    // Serialize the model to JSON
+    string json = JsonConvert.SerializeObject(Model, Formatting.Indented);
+
+    // Display the JSON in the console
+    Console.WriteLine(json);
 }
 
 <h1>Details</h1>
@@ -11,16 +17,10 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
+            @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.isFeatured)
@@ -28,9 +28,38 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.isFeatured)
         </dd>
+
+
     </dl>
+    <p>Artworks</p>
+    <table class="table">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Completion Date</th>
+            <th>Artwork</th>
+        </tr>
+        @if (Model.Artworks != null)
+        {
+           
+            @foreach (var item in Model.Artworks)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(m=> item.Title)</td>
+                    <td>@Html.DisplayFor(m=> item.Description)</td>
+                    <td>@Html.DisplayFor(m=> item.Price)</td>
+                    <td>@Html.DisplayFor(m=> item.CompletionDate)</td>
+                    <td><img src="@Html.DisplayFor(m=> item.ImageUrl)" height="300"></td>
+                </tr>
+            }
+        }
+    </table>
+   
+    
+
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
