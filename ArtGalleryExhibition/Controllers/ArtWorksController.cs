@@ -14,19 +14,21 @@ namespace ArtGalleryExhibition.Controllers
     public class ArtWorksController : Controller
     {
         private readonly ArtGalleryExhibitionContext _context;
+      //  private IArtWorkService artWorkService; 
 
-        public ArtWorksController(ArtGalleryExhibitionContext context)
+        public ArtWorksController(ArtGalleryExhibitionContext context/*, IArtWorkService artWorkService*/)
         {
             _context = context;
+            //artWorkService = artWorkService;
         }
-
 
         // GET: ArtWorks
         public async Task<IActionResult> Index()
         {
-              return _context.ArtWork != null ? 
-                          View(await _context.ArtWork.ToListAsync()) :
-                          Problem("Entity set 'ArtGalleryExhibitionContext.ArtWork'  is null.");
+            return _context.ArtWork != null ?
+                           View(await _context.ArtWork.ToListAsync()) :
+                        Problem("Entity set 'ArtGalleryExhibitionContext.ArtWork'  is null.");
+            //   return View(artWorkService.GetAllArtWorks());
         }
 
         // GET: ArtWorks/Details/5

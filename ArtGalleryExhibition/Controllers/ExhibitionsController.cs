@@ -15,9 +15,9 @@ namespace ArtGalleryExhibition.Controllers
     public class ExhibitionsController : Controller
     {
         private readonly ArtGalleryExhibitionContext _context;
-        private readonly ICartService _cartService;
+        private readonly IShopCartService _cartService;
 
-        public ExhibitionsController(ArtGalleryExhibitionContext context, ICartService cartService)
+        public ExhibitionsController(ArtGalleryExhibitionContext context, IShopCartService cartService)
         {
             _context = context;
             _cartService = cartService;
@@ -35,7 +35,7 @@ namespace ArtGalleryExhibition.Controllers
             foreach(var artId in selectedArtworkIds)
             {
               var artwork =  _context.ArtWork.FirstOrDefault(m => m.ID == artId);
-                chosenArts.Add(new CartItem(artwork.ID, artwork.Title, (decimal)artwork.Price));
+                chosenArts.Add(new CartItem(artwork.ID, artwork));
             }
             var selectedArtworks = _context.ArtWork
                 .Where(artwork => selectedArtworkIds.Contains(artwork.ID))
@@ -43,15 +43,16 @@ namespace ArtGalleryExhibition.Controllers
 
             foreach (var artwork in selectedArtworks)
             {
-                _cartService.AddToCart(artwork.ID, artwork.Title, (decimal)artwork.Price);
+                //  _cartService.AddToCart(artwork.ID, artwork.Title, (decimal)artwork.Price);
+                _cartService.AddToCart(artwork);
             }
 
             // Log the current cart to the console
             Console.WriteLine("Current Cart:");
-            var currentCart = _cartService.GetCart();
+            var currentCart = _cartService.GetCartItems();
             foreach (var item in currentCart)
             {
-                Console.WriteLine($"Artwork ID: {item.ArtworkId}, Title: {item.Title}, Price: {item.Price}");
+                Console.WriteLine($"Artwork ID: {item.Artwork.ID}, Title: {item.Artwork.Title}, Price: {item.Artwork.Price}");
             }
 
             // Redirect back to the exhibition details page or wherever appropriate

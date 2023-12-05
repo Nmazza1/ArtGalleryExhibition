@@ -16,6 +16,12 @@ namespace ArtGalleryExhibition.Data
 
         public DbSet<ArtGalleryExhibition.Models.Artist> Artist { get; set; } = default!;
 
+        public DbSet<ArtGalleryExhibition.Models.CartItem> CartItems { get; set; }
+        
+        public DbSet<ArtGalleryExhibition.Models.Order> Orders { get; set; }
+
+        public DbSet<ArtGalleryExhibition.Models.OrderDetail> OrderDetails { get; set; }
+
         public DbSet<ArtGalleryExhibition.Models.ArtWork>? ArtWork { get; set; }
 
         public DbSet<ArtGalleryExhibition.Models.Exhibition>? Exhibition { get; set; }

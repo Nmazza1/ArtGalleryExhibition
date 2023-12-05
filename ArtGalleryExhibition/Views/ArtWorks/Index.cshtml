@@ -16,6 +16,7 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
+                
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
@@ -36,7 +37,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                @Html.DisplayFor(modelItem => item.ID)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
@@ -50,13 +51,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.ImageUrl)
             </td>
-                @if (User.IsInRole("Admin")){
+                @* @if (User.IsInRole("Admin")){ *@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                 <div class="mbr-section-btn pt-3"><a asp-controller="ShopCart" asp-action="AddToCart" asp-route-id=@item.ID class="btn btn-primary display-4"><span class="mbrib-cart-add mbr-iconfont mbr-iconfont-btn"></span>Add to cart&nbsp;</a></div>
             </td>
-                }
+                @* } *@
         </tr>
 }
     </tbody>

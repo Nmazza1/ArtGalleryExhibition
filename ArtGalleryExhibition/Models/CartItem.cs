@@ -2,15 +2,25 @@
 {
     public class CartItem
     {
-        public int ArtworkId { get; set; }
-        public string Title { get; set; }
-        public decimal Price { get; set; }
+        public int Id { get; set; }
+        public ArtWork? Artwork { get; set; }
+        public string? CartId { get; set; }
 
-        public CartItem(int artworkId, string title, decimal price)
+        public CartItem (int id, ArtWork? artwork, string? cartId)
         {
-            ArtworkId = artworkId;
-            Title = title;
-            Price = price;
+            Id = id;
+            Artwork = artwork;
+            CartId = cartId;
+        }
+
+        public CartItem (int id, ArtWork? artwork)
+        {
+            Id= id;
+            Artwork = artwork;
+        }
+        public CartItem()
+        {
+
         }
     }
 
