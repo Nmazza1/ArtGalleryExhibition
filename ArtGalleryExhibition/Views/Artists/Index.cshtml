@@ -1,14 +1,16 @@
 ﻿@model IEnumerable<ArtGalleryExhibition.Models.Artist>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Artists";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<h1>Artists</h1>
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -30,11 +32,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.isFeatured)
             </td>
+                @if (User.IsInRole("Admin")){
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
             </td>
+                }
         </tr>
 }
     </tbody>

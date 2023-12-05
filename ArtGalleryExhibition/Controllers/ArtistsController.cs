@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ArtGalleryExhibition.Data;
 using ArtGalleryExhibition.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ArtGalleryExhibition.Controllers
 {
@@ -46,6 +47,8 @@ namespace ArtGalleryExhibition.Controllers
             return View(artist);
         }
 
+
+        [Authorize(Roles = "Admin")]
         // GET: Artists/Create
         public IActionResult Create()
         {
@@ -56,6 +59,7 @@ namespace ArtGalleryExhibition.Controllers
         // POST: Artists/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,isFeatured,ExhibitionID")] Artist artist)
@@ -70,7 +74,7 @@ namespace ArtGalleryExhibition.Controllers
             return View(artist);
         }
 
-        // GET: Artists/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Artist == null)
@@ -87,9 +91,7 @@ namespace ArtGalleryExhibition.Controllers
             return View(artist);
         }
 
-        // POST: Artists/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,Name,isFeatured,ExhibitionID")] Artist artist)
@@ -123,7 +125,7 @@ namespace ArtGalleryExhibition.Controllers
             return View(artist);
         }
 
-        // GET: Artists/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Artist == null)
@@ -141,7 +143,7 @@ namespace ArtGalleryExhibition.Controllers
             return View(artist);
         }
 
-        // POST: Artists/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

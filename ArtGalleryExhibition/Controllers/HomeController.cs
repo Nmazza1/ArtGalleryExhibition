@@ -33,15 +33,6 @@ using Microsoft.AspNetCore.Mvc;
             return View(viewModel);
             }
 
-            public IActionResult Privacy()
-            {
-                return View();
-            }
-        [Authorize(Roles = "Admin")]
-        public IActionResult AdminPage()
-        {
-            return View();
-        }
 
             [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
             public IActionResult Error()
